@@ -1,10 +1,13 @@
 import { app, ipcMain } from 'electron';
 
-export function registerIpcHandlers(window) {
-	const isTrustedWindow = (event) => event.sender === window.webContents;
+export function registerIpcHandlers(getWindow) {
+	const getTrustedWindow = (event) => {
+		const window = getWindow();
+		return window && !window.isDestroyed() && event.sender === window.webContents ? window : null;
+	};
 
 	ipcMain.handle('app:get-info', (event) => {
-		if (!isTrustedWindow(event)) return null;
+		if (!getTrustedWindow(event)) return null;
 
 		return {
 			name: app.getName(),
@@ -14,13 +17,15 @@ export function registerIpcHandlers(window) {
 	});
 
 	ipcMain.handle('window:minimize', (event) => {
-		if (!isTrustedWindow(event) || window.isDestroyed()) return false;
+		const window = getTrustedWindow(event);
+		if (!window) return false;
 		window.minimize();
 		return true;
 	});
 
 	ipcMain.handle('window:toggle-maximize', (event) => {
-		if (!isTrustedWindow(event) || window.isDestroyed()) return false;
+		const window = getTrustedWindow(event);
+		if (!window) return false;
 
 		if (window.isMaximized()) window.unmaximize();
 		else window.maximize();
@@ -29,7 +34,8 @@ export function registerIpcHandlers(window) {
 	});
 
 	ipcMain.handle('window:close', (event) => {
-		if (!isTrustedWindow(event) || window.isDestroyed()) return false;
+		const window = getTrustedWindow(event);
+		if (!window) return false;
 		window.close();
 		return true;
 	});
