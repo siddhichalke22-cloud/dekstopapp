@@ -1,6 +1,4 @@
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import * as projectsService from '../services/projectsService.js';
 const allowedStatuses = new Set(['PLANNING', 'IN_PROGRESS', 'IN_REVIEW', 'COMPLETED']);
 const editableFields = ['name', 'description', 'status', 'progress', 'dueDate', 'teamId'];
 
@@ -50,10 +48,7 @@ function normalizeProjectData(data) {
 
 export async function listProjects(_request, response, next) {
 	try {
-		const projects = await prisma.project.findMany({
-			include: { members: true, team: true },
-			orderBy: { updatedAt: 'desc' },
-		});
+		const projects = await projectsService.listProjects();
 		return response.json(projects);
 	} catch (error) {
 		return next(error);
@@ -62,10 +57,7 @@ export async function listProjects(_request, response, next) {
 
 export async function getProject(request, response, next) {
 	try {
-		const project = await prisma.project.findUnique({
-			where: { id: request.params.id },
-			include: { members: true, team: true },
-		});
+		const project = await projectsService.getProjectById(request.params.id);
 		if (!project) return response.status(404).json({ error: 'Project not found' });
 		return response.json(project);
 	} catch (error) {
@@ -78,7 +70,7 @@ export async function createProject(request, response, next) {
 	if (validationError) return response.status(400).json({ error: validationError });
 
 	try {
-		const project = await prisma.project.create({ data: normalizeProjectData(selectEditableData(request.body)) });
+		const project = await projectsService.createProject(normalizeProjectData(selectEditableData(request.body)));
 		return response.status(201).json(project);
 	} catch (error) {
 		return next(error);
@@ -94,10 +86,7 @@ export async function updateProject(request, response, next) {
 	if (validationError) return response.status(400).json({ error: validationError });
 
 	try {
-		const project = await prisma.project.update({
-			where: { id: request.params.id },
-			data: normalizeProjectData(data),
-		});
+		const project = await projectsService.updateProject(request.params.id, normalizeProjectData(data));
 		return response.json(project);
 	} catch (error) {
 		if (error.code === 'P2025') return response.status(404).json({ error: 'Project not found' });
@@ -107,7 +96,7 @@ export async function updateProject(request, response, next) {
 
 export async function deleteProject(request, response, next) {
 	try {
-		await prisma.project.delete({ where: { id: request.params.id } });
+		await projectsService.deleteProject(request.params.id);
 		return response.status(204).end();
 	} catch (error) {
 		if (error.code === 'P2025') return response.status(404).json({ error: 'Project not found' });
