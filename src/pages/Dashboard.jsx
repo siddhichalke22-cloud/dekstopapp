@@ -52,7 +52,7 @@ export default function Dashboard() {
 		if (!currentUser) return;
 		const controller = new AbortController();
 		api.getMyProfile({ signal: controller.signal }).then((profile) => setLearningGoalCount(profile.learningGoals?.length || 0)).catch(() => {});
-		// return () => controller.abort();
+		return () => controller.abort();
 	}, []);
 
 	const activities = [
