@@ -1,0 +1,48 @@
+.ui-button {
+	--button-bg: #29332b;
+	--button-fg: #fff;
+	--button-border: transparent;
+	align-items: center;
+	border: 1px solid var(--button-border);
+	border-radius: 4px;
+	background: var(--button-bg);
+	color: var(--button-fg);
+	display: inline-flex;
+	font: inherit;
+	font-size: 12px;
+	font-weight: 600;
+	gap: 8px;
+	justify-content: center;
+	line-height: 1;
+	white-space: nowrap;
+	cursor: pointer;
+	transition: background-color 140ms ease, border-color 140ms ease, transform 140ms ease;
+}
+
+.ui-button--small { min-height: 30px; padding: 0 10px; font-size: 11px; }
+.ui-button--medium { min-height: 37px; padding: 0 14px; }
+.ui-button--large { min-height: 44px; padding: 0 18px; }
+.ui-button--primary:hover { --button-bg: #3b493d; }
+.ui-button--secondary { --button-bg: #fff; --button-fg: #303730; --button-border: #dfe3db; }
+.ui-button--secondary:hover { --button-bg: #f0f2ec; }
+.ui-button--ghost { --button-bg: transparent; --button-fg: #465047; }
+.ui-button--ghost:hover { --button-bg: #edf0e9; }
+.ui-button--danger { --button-bg: #b74e3d; }
+.ui-button--danger:hover { --button-bg: #9f3d30; }
+.ui-button:active:not(:disabled) { transform: translateY(1px); }
+.ui-button:focus-visible { outline: 3px solid #a8ca6b; outline-offset: 2px; }
+.ui-button:disabled { cursor: not-allowed; opacity: .58; }
+.ui-button__spinner {
+	width: 13px;
+	height: 13px;
+	border: 2px solid currentColor;
+	border-right-color: transparent;
+	border-radius: 50%;
+	animation: ui-button-spin 700ms linear infinite;
+}
+
+@keyframes ui-button-spin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+	.ui-button, .ui-button__spinner { transition: none; animation-duration: 1.5s; }
+}
