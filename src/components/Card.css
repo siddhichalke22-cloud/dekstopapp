@@ -1,0 +1,19 @@
+.ui-card {
+	--card-accent: #9fbe5d;
+	min-width: 0;
+	padding: 18px;
+	border: 1px solid #e3e6df;
+	border-radius: 4px;
+	background: #fbfcf9;
+	color: #252b25;
+}
+
+.ui-card--blue { --card-accent: #80b6c4; }
+.ui-card--coral { --card-accent: #d99378; }
+.ui-card--gold { --card-accent: #c7a849; }
+.ui-card__header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.ui-card__title { margin: 0; color: #747d72; font-size: 11px; font-weight: 500; }
+.ui-card__accent { width: 8px; height: 8px; flex: none; border-radius: 50%; background: var(--card-accent); }
+.ui-card__value { margin: 11px 0 4px; font: 700 29px/1.15 Manrope, 'DM Sans', sans-serif; }
+.ui-card__detail { margin: 0; color: #92988e; font-size: 10px; line-height: 1.5; }
+.ui-card__content { margin-top: 12px; }
