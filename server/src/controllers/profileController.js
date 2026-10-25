@@ -1,6 +1,4 @@
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '../services/prisma.js';
 const editableFields = ['name', 'email', 'title', 'initials', 'bio', 'university', 'major'];
 
 export async function getProfile(_request, response, next) {
