@@ -1,0 +1,99 @@
+.workspace-navbar {
+	min-height: 60px;
+	padding: 0 30px;
+	border-bottom: 1px solid #e3e6df;
+	background: #fbfcf9;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 20px;
+}
+
+.workspace-navbar__breadcrumb,
+.workspace-navbar__tools {
+	display: flex;
+	align-items: center;
+}
+
+.workspace-navbar__breadcrumb {
+	gap: 9px;
+	font-size: 11px;
+	color: #92988f;
+}
+
+.workspace-navbar__breadcrumb strong {
+	color: #414741;
+	font-weight: 600;
+}
+
+.workspace-navbar__separator { color: #c6cac3; }
+.workspace-navbar__tools { gap: 13px; }
+
+.workspace-navbar__search {
+	min-height: 32px;
+	padding: 0 8px;
+	border: 1px solid #e3e6df;
+	border-radius: 3px;
+	display: flex;
+	align-items: center;
+	gap: 7px;
+	color: #858d83;
+}
+
+.workspace-navbar__search input {
+	width: 125px;
+	border: 0;
+	outline: 0;
+	background: transparent;
+	color: #252b25;
+	font: inherit;
+	font-size: 10px;
+}
+
+.workspace-navbar__search input::placeholder { color: #92988f; }
+.workspace-navbar__search kbd { font: 9px 'DM Sans', sans-serif; color: #92988f; }
+
+.workspace-navbar__icon-button {
+	position: relative;
+	width: 31px;
+	height: 31px;
+	border: 0;
+	border-radius: 4px;
+	background: transparent;
+	display: grid;
+	place-items: center;
+	color: #6e756e;
+}
+
+.workspace-navbar__icon-button:hover { background: #eff1ec; }
+.workspace-navbar__notification-dot { position: absolute; top: 6px; right: 7px; width: 6px; height: 6px; border: 1px solid #fbfcf9; border-radius: 50%; background: #d9785a; }
+
+.workspace-navbar__profile {
+	width: 29px;
+	height: 29px;
+	border-radius: 50%;
+	background: #f1c6b6;
+	color: #3c352f;
+	display: grid;
+	place-items: center;
+	font-size: 9px;
+	font-weight: 700;
+	text-decoration: none;
+}
+
+.workspace-navbar__profile:focus-visible,
+.workspace-navbar__icon-button:focus-visible,
+.workspace-navbar__search:focus-within { outline: 2px solid #91ad58; outline-offset: 2px; }
+
+@media (max-width: 600px) {
+	.workspace-navbar { min-height: 53px; padding: 0 15px; gap: 8px; }
+	.workspace-navbar__breadcrumb { gap: 6px; font-size: 10px; }
+	.workspace-navbar__tools { gap: 7px; }
+	.workspace-navbar__search { min-height: 29px; padding: 0 6px; }
+	.workspace-navbar__search input { width: 90px; }
+	.workspace-navbar__search kbd { display: none; }
+}
+
+@media (max-width: 400px) {
+	.workspace-navbar__search { display: none; }
+}
