@@ -54,6 +54,7 @@
 		"directories": {
 			"output": "release"
 		},
+		"electronLanguages": ["en-US"],
 		"files": [
 			"dist/**/*",
 			"electron/**/*",
