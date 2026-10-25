@@ -46,6 +46,8 @@
 .teams-card__focus > span { grid-column: 1 / -1; color: #999f96; font-size: 7px; font-weight: 700; letter-spacing: .8px; }
 .teams-card__focus strong { overflow: hidden; color: #40473f; font-size: 9px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
 .teams-card__focus > svg { color: #838a80; }
+.teams-card__focus button { grid-column: 1 / -1; justify-self: start; padding: 5px 0 0; border: 0; background: transparent; color: #586b48; display: inline-flex; align-items: center; gap: 4px; font: 600 8px 'DM Sans', sans-serif; cursor: pointer; }
+.teams-card__focus button:disabled { color: #7e9270; cursor: default; }
 .teams-empty { grid-column: 1 / -1; padding: 42px 10px; color: #8e948c; text-align: center; font-size: 10px; }
 .teams-error { margin: 8px 0; color: #b45d49; font-size: 10px; }
 .teams-connection { margin-top: 13px; color: #9aa096; display: flex; align-items: center; gap: 6px; font-size: 8px; }

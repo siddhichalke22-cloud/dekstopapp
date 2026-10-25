@@ -107,3 +107,35 @@ export async function deleteTeam(request, response, next) {
 		return next(error);
 	}
 }
+
+export async function applyToTeam(request, response, next) {
+	const { message = '' } = request.body || {};
+	if (typeof message !== 'string' || message.length > 1000) {
+		return response.status(400).json({ error: 'Application message must be under 1000 characters' });
+	}
+
+	try {
+		const application = await prisma.teamApplication.create({
+			data: { teamId: request.params.id, userId: request.user.id, message: message.trim() },
+			include: { team: { select: { id: true, name: true } } },
+		});
+		return response.status(201).json(application);
+	} catch (error) {
+		if (error.code === 'P2002') return response.status(409).json({ error: 'You already requested to join this team' });
+		if (error.code === 'P2003') return response.status(404).json({ error: 'Team not found' });
+		return next(error);
+	}
+}
+
+export async function listMyTeamApplications(request, response, next) {
+	try {
+		const applications = await prisma.teamApplication.findMany({
+			where: { userId: request.user.id },
+			include: { team: true },
+			orderBy: { createdAt: 'desc' },
+		});
+		return response.json(applications);
+	} catch (error) {
+		return next(error);
+	}
+}

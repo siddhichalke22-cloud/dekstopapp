@@ -2,15 +2,16 @@ import { useEffect, useState } from 'react';
 import { ArrowUpRight, Camera, Check, CircleUserRound, LogOut, ShieldCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button.jsx';
-import { api, clearSession, getSessionUser } from '../services/api.js';
+import { api, clearSession } from '../services/api.js';
 import './Profile.css';
 
-const apiUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:4000/api';
 const defaultProfile = {
 	name: 'Jamie Diaz',
 	email: 'jamie@northstar.design',
 	title: 'Product designer',
 	initials: 'JD',
+	projectUpdates: true,
+	weeklyDigest: true,
 };
 
 export default function Profile() {
@@ -36,6 +37,8 @@ export default function Profile() {
 					bio: data.bio || '',
 					university: data.university || '',
 					major: data.major || '',
+					projectUpdates: data.projectUpdates ?? true,
+					weeklyDigest: data.weeklyDigest ?? true,
 				});
 				setSkillsText((data.skills || []).map((item) => `${item.skill.name} (${item.proficiency.toLowerCase()})`).join(', '));
 				setGoalsText((data.learningGoals || []).map((item) => item.skill.name).join(', '));
@@ -51,8 +54,8 @@ export default function Profile() {
 	}, []);
 
 	function updateField(event) {
-		const { name, value } = event.target;
-		setProfile((current) => ({ ...current, [name]: value }));
+		const { name, value, checked, type } = event.target;
+		setProfile((current) => ({ ...current, [name]: type === 'checkbox' ? checked : value }));
 		setMessage('');
 	}
 
@@ -129,11 +132,11 @@ export default function Profile() {
 						<h2><CircleUserRound size={16} /> Preferences</h2>
 						<label className="profile-preference-row">
 							<span><strong>Project updates</strong><small>Mentions, assignments, and status changes</small></span>
-							<input type="checkbox" defaultChecked />
+							<input checked={profile.projectUpdates ?? true} name="projectUpdates" onChange={updateField} type="checkbox" />
 						</label>
 						<label className="profile-preference-row">
 							<span><strong>Weekly digest</strong><small>A summary of your team’s progress</small></span>
-							<input type="checkbox" defaultChecked />
+							<input checked={profile.weeklyDigest ?? true} name="weeklyDigest" onChange={updateField} type="checkbox" />
 						</label>
 					</section>
 				</section>

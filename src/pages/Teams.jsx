@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ArrowRight, Plus, Search, Users, X } from 'lucide-react';
 import Button from '../components/Button.jsx';
+import { api } from '../services/api.js';
 import './Teams.css';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:4000/api';
 const sampleTeams = [
 	{ id: 'design', name: 'Open Campus Lab', description: 'CAMPUS TECH', members: [{ initials: 'JD' }, { initials: 'PS' }, { initials: 'NK' }, { initials: 'AO' }], projects: [{ name: 'Campus accessibility map' }] },
 	{ id: 'growth', name: 'BuildTogether', description: 'HACKATHON', members: [{ initials: 'MK' }, { initials: 'SP' }, { initials: 'JD' }], projects: [{ name: 'Study buddy matching' }] },
@@ -54,14 +54,11 @@ export default function Teams() {
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [apiConnected, setApiConnected] = useState(false);
 	const [error, setError] = useState('');
+	const [applicationState, setApplicationState] = useState({});
 
 	useEffect(() => {
 		const controller = new AbortController();
-		fetch(`${API_URL}/teams`, { signal: controller.signal })
-			.then((response) => {
-				if (!response.ok) throw new Error('Teams API request failed');
-				return response.json();
-			})
+		api.getTeams({ signal: controller.signal })
 			.then((data) => {
 				if (Array.isArray(data)) setTeams(data);
 				setApiConnected(true);
@@ -69,7 +66,7 @@ export default function Teams() {
 			.catch((requestError) => {
 				if (requestError.name !== 'AbortError') {
 					setApiConnected(false);
-				setError('Could not load teams from the server. Showing preview teams instead.');
+					setError(requestError.message || 'Could not load teams from the server.');
 			}
 			});
 		return () => controller.abort();
@@ -80,16 +77,20 @@ export default function Teams() {
 	)), [teams, query]);
 
 	async function createTeam(team) {
-		const response = await fetch(`${API_URL}/teams`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(team),
-		});
-		const result = await response.json().catch(() => ({}));
-		if (!response.ok) throw new Error(result.error || 'Could not create team. Is the API running?');
+		const result = await api.createTeam(team);
 		setTeams((current) => [...current, result].sort((left, right) => left.name.localeCompare(right.name)));
 		setApiConnected(true);
 		setError('');
+	}
+
+	async function requestToJoin(teamId) {
+		try {
+			await api.applyToTeam(teamId, 'I would like to join this student collaboration team.');
+			setApplicationState((current) => ({ ...current, [teamId]: 'Request sent' }));
+			setError('');
+		} catch (requestError) {
+			setError(requestError.status === 401 ? 'Sign in before requesting to join a team.' : requestError.message);
+		}
 	}
 
 	const memberCount = teams.reduce((total, team) => total + (team.members?.length || 0), 0);
@@ -133,7 +134,7 @@ export default function Teams() {
 									{members.slice(0, 4).map((member, memberIndex) => <span className={`teams-avatar teams-avatar--${avatarTones[memberIndex % avatarTones.length]}`} key={member.userId || member.user?.id || memberIndex}>{member.initials || member.user?.initials || 'TM'}</span>)}
 									<span>{members.length} {members.length === 1 ? 'member' : 'members'}</span>
 								</div>
-								<div className="teams-card__focus"><span>FOCUS PROJECT</span><strong>{project?.name || 'No project assigned'}</strong><ArrowRight size={14} /></div>
+								<div className="teams-card__focus"><span>FOCUS PROJECT</span><strong>{project?.name || 'No project assigned'}</strong><button type="button" onClick={() => requestToJoin(team.id)} disabled={Boolean(applicationState[team.id])}>{applicationState[team.id] || 'Request to join'} <ArrowRight size={13} /></button></div>
 							</div>
 						</article>
 					);

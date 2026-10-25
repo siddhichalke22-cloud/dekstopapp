@@ -3,6 +3,7 @@ import { ArrowRight, ArrowUpRight, CalendarDays, Ellipsis, Plus } from 'lucide-r
 import { Link } from 'react-router-dom';
 import Button from '../components/Button.jsx';
 import Card from '../components/Card.jsx';
+import { api, getSessionUser } from '../services/api.js';
 import './Dashboard.css';
 
 const sampleProjects = [
@@ -10,14 +11,6 @@ const sampleProjects = [
 	{ id: 'study-buddy', name: 'Study buddy matching', category: 'Looking for a Python learner', progress: 42, dueDate: 'Nov 14', tone: 'blue', people: ['MK', 'SP'] },
 	{ id: 'food-waste', name: 'Food waste tracker', category: 'Data + design collaboration', progress: 64, dueDate: 'Nov 21', tone: 'coral', people: ['AL', 'JD'] },
 ];
-
-const activities = [
-	{ initials: 'PS', name: 'Priya Shah', action: 'is looking for', item: 'a React teammate', note: 'Campus accessibility map', time: '12 min ago', tone: 'blue' },
-	{ initials: 'AO', name: 'Amara Okafor', action: 'offered to teach', item: 'data visualization', note: 'in exchange for TypeScript practice', time: '48 min ago', tone: 'green' },
-	{ initials: 'NK', name: 'Noah Kim', action: 'started a', item: 'study buddy project', note: 'Looking for two collaborators', time: '2 hours ago', tone: 'gold' },
-];
-
-const apiUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:4000/api';
 
 function initialsTone(initials) {
 	return `dashboard-avatar--${({ JD: 'coral', MK: 'blue', AL: 'green', SP: 'gold' })[initials] || 'lilac'}`;
@@ -31,16 +24,16 @@ function ProjectPeople({ people }) {
 
 export default function Dashboard() {
 	const [projects, setProjects] = useState(sampleProjects);
+	const [students, setStudents] = useState([]);
+	const [offers, setOffers] = useState([]);
+	const [learningGoalCount, setLearningGoalCount] = useState(0);
 	const [apiConnected, setApiConnected] = useState(false);
+	const currentUser = getSessionUser();
 
 	useEffect(() => {
 		const controller = new AbortController();
-		fetch(`${apiUrl}/projects`, { signal: controller.signal })
-			.then((response) => {
-				if (!response.ok) throw new Error('Projects request failed');
-				return response.json();
-			})
-			.then((items) => {
+		Promise.all([api.getProjects({ signal: controller.signal }), api.getStudents({ signal: controller.signal }), api.getSkillOffers({ signal: controller.signal })])
+			.then(([items, studentItems, skillOffers]) => {
 				if (!Array.isArray(items)) return;
 				setProjects(items.slice(0, 3).map((project, index) => ({
 					id: project.id,
@@ -51,6 +44,8 @@ export default function Dashboard() {
 					tone: ['green', 'blue', 'coral'][index % 3],
 					people: (project.members || []).slice(0, 3).map((member) => member.initials || member.user?.initials).filter(Boolean),
 				})));
+				setStudents(Array.isArray(studentItems) ? studentItems.filter((student) => student.id !== currentUser?.id) : []);
+				setOffers(Array.isArray(skillOffers) ? skillOffers : []);
 				setApiConnected(true);
 			})
 			.catch((error) => {
@@ -58,6 +53,18 @@ export default function Dashboard() {
 			});
 		return () => controller.abort();
 	}, []);
+
+	useEffect(() => {
+		if (!currentUser) return;
+		const controller = new AbortController();
+		api.getMyProfile({ signal: controller.signal }).then((profile) => setLearningGoalCount(profile.learningGoals?.length || 0)).catch(() => {});
+		return () => controller.abort();
+	}, []);
+
+	const activities = [
+		...offers.slice(0, 2).map((offer) => ({ initials: offer.user.initials, name: offer.user.name, action: 'offers to teach', item: offer.teachingSkill.name, note: `Wants to learn ${offer.wantedSkill.name}`, time: new Date(offer.createdAt).toLocaleDateString(), tone: 'green' })),
+		...students.slice(0, 2).map((student) => ({ initials: student.initials, name: student.name, action: 'is studying', item: student.major || 'new skills', note: student.university || 'Student on SkillBridge', time: 'Student profile', tone: 'blue' })),
+	].slice(0, 3);
 
 	return (
 		<div className="dashboard-page">
@@ -71,9 +78,9 @@ export default function Dashboard() {
 			</section>
 
 			<section className="dashboard-summary" aria-label="Workspace summary">
-				<Card title="Projects to join" value="08" detail={<><span className="dashboard-trend"><ArrowUpRight size={13} /> 3</span> match your skills</>} accent="green" />
-				<Card title="Potential teammates" value="12" detail="With complementary skills" accent="blue" />
-				<Card title="Learning goals" value="03" detail="In progress this term" accent="coral" />
+				<Card title="Projects to join" value={String(projects.length).padStart(2, '0')} detail="Open in the student network" accent="green" />
+				<Card title="Potential teammates" value={String(students.length).padStart(2, '0')} detail="Student profiles to explore" accent="blue" />
+				<Card title="Learning goals" value={String(learningGoalCount).padStart(2, '0')} detail={currentUser ? 'Saved on your profile' : 'Sign in to track your goals'} accent="coral" />
 				<div className="dashboard-focus">
 					<span className="dashboard-focus__spark" aria-hidden="true">✳</span>
 					<p className="dashboard-eyebrow">THIS WEEK</p>
@@ -116,6 +123,7 @@ export default function Dashboard() {
 								<div><p><strong>{activity.name}</strong> {activity.action} <b>{activity.item}</b></p><span className="dashboard-activity__note">{activity.note}</span><time>{activity.time}</time></div>
 							</article>
 						))}
+						{activities.length === 0 && <p className="dashboard-activity__note">Student activity will appear here as projects and skill offers are added.</p>}
 					</div>
 					<button className="dashboard-text-link dashboard-activity__all" type="button">See all activity <ArrowRight size={14} /></button>
 				</section>

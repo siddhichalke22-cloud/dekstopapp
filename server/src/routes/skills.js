@@ -6,7 +6,7 @@ const router = Router();
 
 router.get('/', listSkills);
 router.get('/exchanges', listSkillExchanges);
-router.post('/exchanges', createSkillExchange);
+router.post('/exchanges', requireAuth, createSkillExchange);
 router.get('/offers', listSkillOffers);
 router.post('/offers', requireAuth, createSkillOffer);
 router.post('/requests', requireAuth, requestSkillExchange);

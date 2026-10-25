@@ -8,6 +8,7 @@ import Profile from './pages/Profile.jsx';
 import Projects from './pages/Projects.jsx';
 import SkillExchange from './pages/SkillExchange.jsx';
 import Teams from './pages/Teams.jsx';
+import { getSessionUser } from './services/api.js';
 import './App.css';
 
 function WorkspaceLayout() {
@@ -32,11 +33,15 @@ function WorkspaceLayout() {
 	);
 }
 
+function ProtectedWorkspace() {
+	return getSessionUser() ? <WorkspaceLayout /> : <Navigate to="/login" replace />;
+}
+
 export default function App() {
 	return (
 		<Routes>
 			<Route path="/login" element={<Login />} />
-			<Route path="/*" element={<WorkspaceLayout />} />
+			<Route path="/*" element={<ProtectedWorkspace />} />
 		</Routes>
 	);
 }

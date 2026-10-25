@@ -87,6 +87,10 @@ export const api = {
 		method: 'DELETE',
 		signal,
 	}),
+	applyToTeam: (id, message = '', { signal } = {}) => request(`/teams/${encodeURIComponent(id)}/applications`, {
+		method: 'POST', body: JSON.stringify({ message }), signal,
+	}),
+	getMyTeamApplications: ({ signal } = {}) => request('/teams/me/applications', { signal }),
 	getProfile: ({ signal } = {}) => request('/profile', { signal }),
 	getMyProfile: ({ signal } = {}) => request('/profile/me', { signal }),
 	getStudents: ({ signal } = {}) => request('/profile/students', { signal }),

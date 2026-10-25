@@ -69,9 +69,20 @@ export async function getProject(request, response, next) {
 export async function createProject(request, response, next) {
 	const validationError = validateProjectData(request.body, { requireName: true });
 	if (validationError) return response.status(400).json({ error: validationError });
+	const requiredSkills = request.body.requiredSkills || [];
+	if (!Array.isArray(requiredSkills) || requiredSkills.some((skill) => !skill || typeof skill.name !== 'string' || !skill.name.trim())) {
+		return response.status(400).json({ error: 'Required skills must be an array of named skills' });
+	}
+	const proficiencyLevels = new Set(['BEGINNER', 'INTERMEDIATE', 'ADVANCED', 'EXPERT']);
+	if (requiredSkills.some((skill) => skill.requiredLevel && !proficiencyLevels.has(skill.requiredLevel))) {
+		return response.status(400).json({ error: 'Required skill level is invalid' });
+	}
 
 	try {
-		const project = await projectsService.createProject(normalizeProjectData(selectEditableData(request.body)));
+		const project = await projectsService.createProject(
+			normalizeProjectData(selectEditableData(request.body)),
+			requiredSkills.map((skill) => ({ name: skill.name.trim(), requiredLevel: skill.requiredLevel || 'BEGINNER' })),
+		);
 		return response.status(201).json(project);
 	} catch (error) {
 		return next(error);

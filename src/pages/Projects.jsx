@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { CalendarDays, Ellipsis, Plus, Search, X } from 'lucide-react';
 import Button from '../components/Button.jsx';
+import { api } from '../services/api.js';
 import './Projects.css';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:4000/api';
 const statuses = ['All projects', 'In progress', 'In review', 'Planning', 'Completed'];
 const statusValues = {
 	'In progress': 'IN_PROGRESS',
@@ -31,6 +31,7 @@ function ProjectDialog({ onClose, onCreate }) {
 	const [name, setName] = useState('');
 	const [description, setDescription] = useState('');
 	const [dueDate, setDueDate] = useState('');
+	const [skills, setSkills] = useState('');
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState('');
 
@@ -39,7 +40,13 @@ function ProjectDialog({ onClose, onCreate }) {
 		setSaving(true);
 		setError('');
 		try {
-			await onCreate({ name, description, dueDate: dueDate || null, status: 'PLANNING' });
+			await onCreate({
+				name,
+				description,
+				dueDate: dueDate || null,
+				status: 'PLANNING',
+				requiredSkills: skills.split(',').map((item) => item.trim()).filter(Boolean).map((name) => ({ name, requiredLevel: 'BEGINNER' })),
+			});
 			onClose();
 		} catch (createError) {
 			setError(createError.message || 'Could not create project.');
@@ -57,6 +64,7 @@ function ProjectDialog({ onClose, onCreate }) {
 				<form onSubmit={submit} className="projects-dialog__form">
 					<label>Project name<input autoFocus maxLength={120} onChange={(event) => setName(event.target.value)} placeholder="e.g. Spring campaign" required value={name} /></label>
 					<label>Description<input maxLength={500} onChange={(event) => setDescription(event.target.value)} placeholder="What is this project about?" value={description} /></label>
+					<label>Skills needed<input onChange={(event) => setSkills(event.target.value)} placeholder="React, Python, UI design" value={skills} /></label>
 					<label>Due date<input onChange={(event) => setDueDate(event.target.value)} type="date" value={dueDate} /></label>
 					<p className="projects-form-error" role="alert">{error}</p>
 					<div className="projects-dialog__actions"><Button variant="secondary" onClick={onClose}>Cancel</Button><Button type="submit" loading={saving}>Create project</Button></div>
@@ -76,17 +84,16 @@ export default function Projects() {
 
 	useEffect(() => {
 		const controller = new AbortController();
-		fetch(`${API_URL}/projects`, { signal: controller.signal })
-			.then((response) => {
-				if (!response.ok) throw new Error('Projects API request failed');
-				return response.json();
-			})
+		api.getProjects({ signal: controller.signal })
 			.then((data) => {
 				if (Array.isArray(data)) setProjects(data);
 				setApiConnected(true);
 			})
 			.catch((requestError) => {
-				if (requestError.name !== 'AbortError') setApiConnected(false);
+				if (requestError.name !== 'AbortError') {
+					setApiConnected(false);
+					setError(requestError.message);
+				}
 			});
 		return () => controller.abort();
 	}, []);
@@ -98,13 +105,7 @@ export default function Projects() {
 	}), [projects, filter, query]);
 
 	async function createProject(project) {
-		const response = await fetch(`${API_URL}/projects`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(project),
-		});
-		const result = await response.json().catch(() => ({}));
-		if (!response.ok) throw new Error(result.error || 'Could not create project. Is the API running?');
+		const result = await api.createProject(project);
 		setProjects((current) => [result, ...current]);
 		setApiConnected(true);
 		setError('');

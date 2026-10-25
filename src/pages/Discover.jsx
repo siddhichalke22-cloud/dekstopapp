@@ -1,35 +1,25 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ArrowRight, Bookmark, Search, Sparkles, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { api } from '../services/api.js';
+import { api, getSessionUser } from '../services/api.js';
 import './Discover.css';
-
-const sampleProjects = [
-	{ id: 'd1', name: 'Campus accessibility map', description: 'Build a community-sourced map of accessible routes and spaces around campus.', status: 'IN_PROGRESS', progress: 28, requiredSkills: [{ name: 'React', level: 'INTERMEDIATE' }, { name: 'GIS', level: 'BEGINNER' }], team: { name: 'Open Campus Lab' }, owner: 'Priya Shah', match: 92 },
-	{ id: 'd2', name: 'Study buddy matching', description: 'A small web app that helps students find study partners by course and schedule.', status: 'PLANNING', progress: 0, requiredSkills: [{ name: 'Python', level: 'BEGINNER' }, { name: 'UI design', level: 'BEGINNER' }], team: { name: 'BuildTogether' }, owner: 'Noah Kim', match: 86 },
-	{ id: 'd3', name: 'Food waste tracker', description: 'Prototype a data dashboard for tracking food waste in student housing.', status: 'IN_PROGRESS', progress: 54, requiredSkills: [{ name: 'Data visualization', level: 'INTERMEDIATE' }, { name: 'Figma', level: 'BEGINNER' }], team: { name: 'Green Bytes' }, owner: 'Amara Okafor', match: 78 },
-];
-
-const sampleStudents = [
-	{ id: 's1', name: 'Priya Shah', initials: 'PS', major: 'Computer Science · 3rd year', skills: ['React', 'TypeScript', 'Accessibility'], learning: 'Product design', seeking: 'Frontend teammate', tone: 'coral' },
-	{ id: 's2', name: 'Noah Kim', initials: 'NK', major: 'Information Systems · 2nd year', skills: ['Python', 'SQL', 'Research'], learning: 'Machine learning', seeking: 'Hackathon team', tone: 'blue' },
-	{ id: 's3', name: 'Amara Okafor', initials: 'AO', major: 'Data Science · 4th year', skills: ['Python', 'Data viz', 'Figma'], learning: 'React', seeking: 'Open to collaborate', tone: 'green' },
-];
 
 const skillFilters = ['All skills', 'React', 'Python', 'Design', 'Data'];
 
 export default function Discover() {
-	const [projects, setProjects] = useState(sampleProjects);
+	const [projects, setProjects] = useState([]);
+	const [students, setStudents] = useState([]);
 	const [query, setQuery] = useState('');
 	const [skill, setSkill] = useState('All skills');
 	const [saved, setSaved] = useState([]);
 	const [connected, setConnected] = useState(false);
+	const [notice, setNotice] = useState('');
 
 	useEffect(() => {
 		const controller = new AbortController();
-		api.getProjects({ signal: controller.signal })
-			.then((items) => {
-				if (Array.isArray(items) && items.length) {
+			Promise.all([api.getProjects({ signal: controller.signal }), api.getStudents({ signal: controller.signal })])
+			.then(([items, studentItems]) => {
+				if (Array.isArray(items)) {
 					setProjects(items.map((project) => ({
 						...project,
 						requiredSkills: project.requiredSkills?.map((item) => ({ name: item.skill?.name || item.name, level: item.requiredLevel || item.level })) || [],
@@ -37,9 +27,13 @@ export default function Discover() {
 						match: project.matchScore || null,
 					})));
 				}
+				setStudents(Array.isArray(studentItems) ? studentItems : []);
 				setConnected(true);
 			})
 			.catch((error) => { if (error.name !== 'AbortError') setConnected(false); });
+		if (getSessionUser()) {
+			api.getBookmarks({ signal: controller.signal }).then((items) => setSaved(items.map((item) => item.id))).catch(() => {});
+		}
 		return () => controller.abort();
 	}, []);
 
@@ -50,8 +44,28 @@ export default function Discover() {
 		return matchesSearch && matchesSkill;
 	}), [projects, query, skill]);
 
-	function toggleSaved(projectId) {
-		setSaved((current) => current.includes(projectId) ? current.filter((id) => id !== projectId) : [...current, projectId]);
+	async function toggleSaved(projectId) {
+		try {
+			if (saved.includes(projectId)) {
+				await api.removeBookmark(projectId);
+				setSaved((current) => current.filter((id) => id !== projectId));
+			} else {
+				await api.saveBookmark(projectId);
+				setSaved((current) => [...current, projectId]);
+			}
+			setNotice('Bookmark saved to your account.');
+		} catch (error) {
+			setNotice(error.status === 401 ? 'Sign in to save projects.' : error.message);
+		}
+	}
+
+	async function applyToProject(projectId) {
+		try {
+			await api.applyToProject(projectId, 'I would like to collaborate on this project.');
+			setNotice('Application submitted. You can track it from your projects.');
+		} catch (error) {
+			setNotice(error.status === 401 ? 'Sign in before applying to a project.' : error.message);
+		}
 	}
 
 	return (
@@ -79,21 +93,23 @@ export default function Discover() {
 								<h3>{project.name}</h3>
 								<p>{project.description || 'Student-led project seeking collaborators.'}</p>
 								<div className="discover-skills">{(project.requiredSkills || []).length ? project.requiredSkills.map((item) => <span key={item.name}>{item.name}<small>{(item.level || 'BEGINNER').toLowerCase()}</small></span>) : <span>Skills open</span>}</div>
-								<div className="discover-project__footer"><span><Users size={13} /> {project.team?.members?.length || 2} teammates</span><Link to="/projects">View project <ArrowRight size={13} /></Link></div>
+								<div className="discover-project__footer"><span><Users size={13} /> {project.team?.members?.length || 0} teammates</span><button type="button" onClick={() => applyToProject(project.id)}>Apply to join <ArrowRight size={13} /></button></div>
 							</div>
 							<button className={`discover-save${saved.includes(project.id) ? ' is-saved' : ''}`} type="button" onClick={() => toggleSaved(project.id)} aria-label={saved.includes(project.id) ? 'Remove saved project' : 'Save project'} title={saved.includes(project.id) ? 'Saved' : 'Save project'}><Bookmark size={16} fill={saved.includes(project.id) ? 'currentColor' : 'none'} /></button>
 						</article>)}
-						{visibleProjects.length === 0 && <p className="discover-empty">No projects match those filters. Try another skill.</p>}
+						{visibleProjects.length === 0 && <p className="discover-empty">{projects.length ? 'No projects match those filters. Try another skill.' : 'No projects are open yet. Create a project to invite collaborators.'}</p>}
 					</div>
-					<div className="discover-data-note"><i className={connected ? 'is-connected' : ''} />{connected ? 'Project listings synced' : 'Preview listings shown until the API is available'}</div>
+					<div className="discover-data-note"><i className={connected ? 'is-connected' : ''} />{connected ? 'Live projects and student profiles' : 'Could not connect to the server'}</div>
+					{notice && <p className="discover-notice" role="status">{notice}</p>}
 				</section>
 
 				<aside className="discover-students">
 					<header className="discover-section-heading"><div><p className="discover-eyebrow">PEOPLE LIKE YOU</p><h2>Potential teammates</h2></div></header>
-					{sampleStudents.map((student) => <article className="discover-student" key={student.id}>
-						<div className={`discover-student__avatar discover-student__avatar--${student.tone}`}>{student.initials}</div>
-						<div className="discover-student__body"><h3>{student.name}</h3><p>{student.major}</p><div className="discover-student__skills">{student.skills.map((item) => <span key={item}>{item}</span>)}</div><p className="discover-student__goal">Learning: <strong>{student.learning}</strong></p><span className="discover-student__seeking">{student.seeking}</span></div>
+					{students.map((student, index) => <article className="discover-student" key={student.id}>
+						<div className={`discover-student__avatar discover-student__avatar--${['coral', 'blue', 'green'][index % 3]}`}>{student.initials}</div>
+						<div className="discover-student__body"><h3>{student.name}</h3><p>{[student.major, student.university].filter(Boolean).join(' · ') || student.title}</p><div className="discover-student__skills">{(student.skills || []).map((item) => <span key={item.skill.id}>{item.skill.name} · {item.proficiency.toLowerCase()}</span>)}</div><p className="discover-student__goal">Learning: <strong>{(student.learningGoals || []).map((item) => item.skill.name).join(', ') || 'Open to learning'}</strong></p></div>
 					</article>)}
+					{students.length === 0 && <p className="discover-empty">No student profiles to show yet. Create your profile to join the directory.</p>}
 					<Link className="discover-profile-link" to="/profile">Complete your skills profile <ArrowRight size={14} /></Link>
 				</aside>
 			</div>

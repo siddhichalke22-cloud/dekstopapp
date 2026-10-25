@@ -22,8 +22,21 @@ export function getProjectById(id) {
 	});
 }
 
-export function createProject(data) {
-	return prisma.project.create({ data });
+export function createProject(data, requiredSkills = []) {
+	return prisma.$transaction(async (transaction) => {
+		const skills = await Promise.all(requiredSkills.map((item) => transaction.skill.upsert({
+			where: { name: item.name },
+			update: {},
+			create: { name: item.name },
+		})));
+		return transaction.project.create({
+			data: {
+				...data,
+				requiredSkills: { create: skills.map((skill, index) => ({ skillId: skill.id, requiredLevel: requiredSkills[index].requiredLevel })) },
+			},
+			...projectRelations,
+		});
+	});
 }
 
 export function updateProject(id, data) {

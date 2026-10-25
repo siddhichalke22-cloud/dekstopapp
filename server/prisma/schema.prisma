@@ -17,6 +17,8 @@ model User {
 	bio       String        @default("")
 	university String       @default("")
 	major     String        @default("")
+	projectUpdates Boolean  @default(true)
+	weeklyDigest   Boolean  @default(true)
 	createdAt DateTime      @default(now())
 	updatedAt DateTime      @updatedAt
 	teams     TeamMember[]

@@ -42,7 +42,7 @@
 .login-submit:focus-visible, .login-password-toggle:focus-visible { outline: 2px solid #91ad58; outline-offset: 2px; }
 .login-message { min-height: 15px; margin: 2px 0 0; color: #ae5944; font-size: 9px; line-height: 1.5; }
 .login-signup { margin: 20px 0 0; padding-top: 16px; border-top: 1px solid #e6e8e2; color: #858c83; text-align: center; font-size: 9px; }
-.login-signup a { margin-left: 3px; color: #46543e; display: inline-flex; align-items: center; gap: 3px; font-weight: 600; text-decoration: none; }
+.login-signup a, .login-signup button { margin-left: 3px; padding: 0; border: 0; background: transparent; color: #46543e; display: inline-flex; align-items: center; gap: 3px; font: inherit; font-weight: 600; text-decoration: none; cursor: pointer; }
 .login-legal { margin: 22px 0 0; color: #a0a69e; text-align: center; font-size: 8px; line-height: 1.5; }
 
 @media (max-width: 760px) {

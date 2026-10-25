@@ -103,9 +103,10 @@ export async function requestSkillExchange(request, response, next) {
 }
 
 export async function createSkillExchange(request, response, next) {
-	const { providerId, requesterId, offeredSkill, wantedSkill, message = '' } = request.body || {};
-	if (![providerId, requesterId, offeredSkill, wantedSkill].every((value) => typeof value === 'string' && value.trim())) {
-		return response.status(400).json({ error: 'providerId, requesterId, offeredSkill, and wantedSkill are required' });
+	const { providerId, offeredSkill, wantedSkill, message = '' } = request.body || {};
+	const requesterId = request.user.id;
+	if (![providerId, offeredSkill, wantedSkill].every((value) => typeof value === 'string' && value.trim())) {
+		return response.status(400).json({ error: 'providerId, offeredSkill, and wantedSkill are required' });
 	}
 	if (providerId === requesterId) return response.status(400).json({ error: 'You cannot request an exchange from yourself' });
 	if (typeof message !== 'string' || message.length > 1000) {
