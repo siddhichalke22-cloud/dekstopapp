@@ -1,0 +1,13 @@
+.app-layout { min-height: 100vh; }
+.app-layout__main { min-height: 100vh; margin-left: 238px; }
+.app-layout__content { width: min(100%, 1500px); margin: 0 auto; padding: 34px 30px 56px; }
+
+@media (max-width: 850px) {
+	.app-layout__main { margin-left: 64px; }
+	.app-layout__content { padding: 28px 22px 44px; }
+}
+
+@media (max-width: 600px) {
+	.app-layout__main { margin: 0 0 58px; min-height: calc(100vh - 58px); }
+	.app-layout__content { padding: 23px 15px 36px; }
+}
