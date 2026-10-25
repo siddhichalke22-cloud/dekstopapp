@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-	provider = "sqlite"
-	// url      = env("DATABASE_URL")
+	provider = "postgresql"
+	url      = env("DATABASE_URL")
 }
 
 model User {
@@ -13,10 +13,53 @@ model User {
 	email     String        @unique
 	title     String        @default("Team member")
 	initials  String        @default("OR")
+	bio       String        @default("")
+	university String       @default("")
+	major     String        @default("")
 	createdAt DateTime      @default(now())
 	updatedAt DateTime      @updatedAt
 	teams     TeamMember[]
 	projects  ProjectMember[]
+	skills    UserSkill[]
+	learningGoals LearningGoal[]
+	projectApplications ProjectApplication[]
+	teamApplications TeamApplication[]
+	skillOffers SkillExchange[] @relation("ExchangeProvider")
+	skillRequests SkillExchange[] @relation("ExchangeRequester")
+}
+
+model Skill {
+	id          String          @id @default(cuid())
+	name        String          @unique
+	category    String          @default("General")
+	userSkills  UserSkill[]
+	learningGoals LearningGoal[]
+	projectRequirements ProjectSkill[]
+	offeredExchanges SkillExchange[] @relation("OfferedSkill")
+	wantedExchanges SkillExchange[] @relation("WantedSkill")
+	createdAt   DateTime        @default(now())
+}
+
+model UserSkill {
+	userId     String
+	skillId    String
+	proficiency String @default("BEGINNER")
+	user       User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+	skill      Skill  @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+	@@id([userId, skillId])
+	@@index([skillId, proficiency])
+}
+
+model LearningGoal {
+	userId      String
+	skillId     String
+	targetLevel String   @default("INTERMEDIATE")
+	user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+	skill       Skill    @relation(fields: [skillId], references: [id], onDelete: Cascade)
+	createdAt   DateTime @default(now())
+
+	@@id([userId, skillId])
 }
 
 model Team {
@@ -27,6 +70,7 @@ model Team {
 	updatedAt   DateTime      @updatedAt
 	members     TeamMember[]
 	projects    Project[]
+	applications TeamApplication[]
 }
 
 model TeamMember {
@@ -50,11 +94,72 @@ model Project {
 	teamId      String?
 	team        Team?           @relation(fields: [teamId], references: [id], onDelete: SetNull)
 	members     ProjectMember[]
+	requiredSkills ProjectSkill[]
+	applications ProjectApplication[]
 	createdAt   DateTime        @default(now())
 	updatedAt   DateTime        @updatedAt
 
 	@@index([status])
 	@@index([teamId])
+}
+
+model ProjectSkill {
+	projectId     String
+	skillId       String
+	requiredLevel String  @default("BEGINNER")
+	project       Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+	skill         Skill   @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+	@@id([projectId, skillId])
+	@@index([skillId, requiredLevel])
+}
+
+model ProjectApplication {
+	id        String   @id @default(cuid())
+	projectId String
+	userId    String
+	message   String   @default("")
+	status    String   @default("PENDING")
+	createdAt DateTime @default(now())
+	updatedAt DateTime @updatedAt
+	project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+	user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+	@@unique([projectId, userId])
+	@@index([userId, status])
+}
+
+model TeamApplication {
+	id        String   @id @default(cuid())
+	teamId    String
+	userId    String
+	message   String   @default("")
+	status    String   @default("PENDING")
+	createdAt DateTime @default(now())
+	updatedAt DateTime @updatedAt
+	team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+	user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+	@@unique([teamId, userId])
+	@@index([userId, status])
+}
+
+model SkillExchange {
+	id               String   @id @default(cuid())
+	providerId       String
+	requesterId      String
+	offeredSkillId   String
+	wantedSkillId    String
+	message          String   @default("")
+	status           String   @default("OPEN")
+	createdAt        DateTime @default(now())
+	updatedAt        DateTime @updatedAt
+	provider         User     @relation("ExchangeProvider", fields: [providerId], references: [id], onDelete: Cascade)
+	requester        User     @relation("ExchangeRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+	offeredSkill     Skill    @relation("OfferedSkill", fields: [offeredSkillId], references: [id], onDelete: Cascade)
+	wantedSkill      Skill    @relation("WantedSkill", fields: [wantedSkillId], references: [id], onDelete: Cascade)
+
+	@@index([status, createdAt])
 }
 
 model ProjectMember {

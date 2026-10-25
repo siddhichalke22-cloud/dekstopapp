@@ -16,12 +16,12 @@ export default function Login() {
 			<section className="login-showcase" aria-label="Orbit workspace">
 				<a className="login-brand" href="#/" aria-label="Orbit home">
 					<span className="login-brand__mark" aria-hidden="true">o</span>
-					<span>orbit<span>.</span></span>
+					<span>SkillBridge<span>.</span></span>
 				</a>
 				<div className="login-showcase__copy">
 					<p className="login-eyebrow">A LITTLE MORE IN FLOW</p>
-					<h1>Good work<br />finds its orbit<span>.</span></h1>
-					<p>Bring the people, projects, and small details together. Then make something you’re proud of.</p>
+					<h1>Find your people.<br />Build what’s next<span>.</span></h1>
+					<p>Meet students with complementary skills, discover projects, and learn by making things together.</p>
 				</div>
 				<div className="login-orbit-art" aria-hidden="true">
 					<div className="login-orbit-art__ring login-orbit-art__ring--outer" />
@@ -29,14 +29,14 @@ export default function Login() {
 					<div className="login-orbit-art__planet" />
 					<span className="login-orbit-art__spark">✳</span>
 				</div>
-				<p className="login-showcase__footer">NORTHSTAR STUDIO <span>·</span> TEAM WORKSPACE</p>
+				<p className="login-showcase__footer">STUDENT PROJECTS <span>·</span> SHARED SKILLS</p>
 			</section>
 
 			<section className="login-form-side">
 				<div className="login-form-wrap">
 					<p className="login-eyebrow">WELCOME BACK</p>
 					<h2>Pick up where<br />you left off.</h2>
-					<p className="login-form-intro">Sign in to your workspace to keep things moving.</p>
+					<p className="login-form-intro">Sign in to find collaborators and continue learning together.</p>
 
 					<form className="login-form" onSubmit={handleSubmit}>
 						<label htmlFor="login-email">Work email</label>

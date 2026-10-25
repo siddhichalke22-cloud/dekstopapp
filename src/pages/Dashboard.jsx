@@ -6,15 +6,15 @@ import Card from '../components/Card.jsx';
 import './Dashboard.css';
 
 const sampleProjects = [
-	{ id: 'website-refresh', name: 'Website refresh', category: 'Brand & digital', progress: 72, dueDate: 'Oct 28', tone: 'green', people: ['JD', 'MK', 'AL'] },
-	{ id: 'fall-launch', name: 'Fall product launch', category: 'Campaign', progress: 48, dueDate: 'Nov 04', tone: 'blue', people: ['MK', 'SP', 'JD'] },
-	{ id: 'customer-research', name: 'Customer research', category: 'Research', progress: 91, dueDate: 'Nov 12', tone: 'coral', people: ['AL', 'JD'] },
+	{ id: 'campus-map', name: 'Campus accessibility map', category: 'Open to frontend + GIS', progress: 28, dueDate: 'Nov 08', tone: 'green', people: ['JD', 'PS', 'NK'] },
+	{ id: 'study-buddy', name: 'Study buddy matching', category: 'Looking for a Python learner', progress: 42, dueDate: 'Nov 14', tone: 'blue', people: ['MK', 'SP'] },
+	{ id: 'food-waste', name: 'Food waste tracker', category: 'Data + design collaboration', progress: 64, dueDate: 'Nov 21', tone: 'coral', people: ['AL', 'JD'] },
 ];
 
 const activities = [
-	{ initials: 'MK', name: 'Morgan Kim', action: 'moved', item: 'Homepage wireframes', note: 'to In review', time: '12 min ago', tone: 'blue' },
-	{ initials: 'AL', name: 'Alex Lee', action: 'commented on', item: 'Customer interview guide', note: '“Added the final questions.”', time: '48 min ago', tone: 'green' },
-	{ initials: 'SP', name: 'Sam Patel', action: 'completed', item: 'Launch moodboard', note: 'in Fall product launch', time: '2 hours ago', tone: 'gold' },
+	{ initials: 'PS', name: 'Priya Shah', action: 'is looking for', item: 'a React teammate', note: 'Campus accessibility map', time: '12 min ago', tone: 'blue' },
+	{ initials: 'AO', name: 'Amara Okafor', action: 'offered to teach', item: 'data visualization', note: 'in exchange for TypeScript practice', time: '48 min ago', tone: 'green' },
+	{ initials: 'NK', name: 'Noah Kim', action: 'started a', item: 'study buddy project', note: 'Looking for two collaborators', time: '2 hours ago', tone: 'gold' },
 ];
 
 const apiUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:4000/api';
@@ -63,30 +63,30 @@ export default function Dashboard() {
 		<div className="dashboard-page">
 			<section className="dashboard-heading">
 				<div>
-					<p className="dashboard-eyebrow">SATURDAY, OCTOBER 24</p>
-					<h1>Good morning, Jamie<span>.</span></h1>
-					<p className="dashboard-subtitle">Here’s what’s moving across your workspace today.</p>
+					<p className="dashboard-eyebrow">YOUR STUDENT NETWORK</p>
+					<h1>Build something together<span>.</span></h1>
+					<p className="dashboard-subtitle">Find a project, meet your next teammate, or share a skill.</p>
 				</div>
 				<Button onClick={() => { window.location.hash = '#/projects'; }}><Plus size={15} /> New project</Button>
 			</section>
 
 			<section className="dashboard-summary" aria-label="Workspace summary">
-				<Card title="Active projects" value="08" detail={<><span className="dashboard-trend"><ArrowUpRight size={13} /> 2</span> added this month</>} accent="green" />
-				<Card title="Tasks completed" value="126" detail={<><span className="dashboard-trend"><ArrowUpRight size={13} /> 18%</span> vs. last month</>} accent="blue" />
-				<Card title="Needs attention" value="03" detail="One fewer than last week" accent="coral" />
+				<Card title="Projects to join" value="08" detail={<><span className="dashboard-trend"><ArrowUpRight size={13} /> 3</span> match your skills</>} accent="green" />
+				<Card title="Potential teammates" value="12" detail="With complementary skills" accent="blue" />
+				<Card title="Learning goals" value="03" detail="In progress this term" accent="coral" />
 				<div className="dashboard-focus">
 					<span className="dashboard-focus__spark" aria-hidden="true">✳</span>
-					<p className="dashboard-eyebrow">TEAM FOCUS</p>
-					<strong>Make room<br />for good work.</strong>
-					<span>One thing at a time.</span>
+					<p className="dashboard-eyebrow">THIS WEEK</p>
+					<strong>Learn by<br />building together.</strong>
+					<span>Share what you know.</span>
 				</div>
 			</section>
 
 			<div className="dashboard-columns">
 				<section className="dashboard-section">
 					<header className="dashboard-section__header">
-						<div><p className="dashboard-eyebrow">IN MOTION</p><h2>Projects <span>08</span></h2></div>
-						<Link to="/projects" className="dashboard-text-link">All projects <ArrowRight size={14} /></Link>
+						<div><p className="dashboard-eyebrow">OPEN OPPORTUNITIES</p><h2>Projects looking for you</h2></div>
+						<Link to="/discover" className="dashboard-text-link">Discover projects <ArrowRight size={14} /></Link>
 					</header>
 					<div className="dashboard-project-list">
 						{projects.map((project) => (
@@ -100,7 +100,7 @@ export default function Dashboard() {
 							</article>
 						))}
 					</div>
-					<Link className="dashboard-view-all" to="/projects"><span><Plus size={14} /></span>View all projects<ArrowRight size={14} /></Link>
+					<Link className="dashboard-view-all" to="/skill-exchange"><span><Plus size={14} /></span>Explore skill exchange<ArrowRight size={14} /></Link>
 					<div className="dashboard-sync"><i className={apiConnected ? 'is-connected' : ''} />{apiConnected ? 'Synced with workspace' : 'Showing workspace preview'}</div>
 				</section>
 

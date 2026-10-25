@@ -3,6 +3,7 @@ import express from 'express';
 import profileRouter from './routes/profile.js';
 import projectsRouter from './routes/projects.js';
 import teamsRouter from './routes/teams.js';
+import skillsRouter from './routes/skills.js';
 
 const app = express();
 const allowedOrigins = new Set([
@@ -26,6 +27,7 @@ app.get('/api/health', (_request, response) => {
 app.use('/api/projects', projectsRouter);
 app.use('/api/teams', teamsRouter);
 app.use('/api/profile', profileRouter);
+app.use('/api/skills', skillsRouter);
 
 app.use((_request, response) => {
 	response.status(404).json({ error: 'Route not found' });

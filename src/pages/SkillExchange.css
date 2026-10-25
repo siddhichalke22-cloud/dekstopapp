@@ -1,0 +1,53 @@
+.exchange-page { color: #252b25; }
+.exchange-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; margin-bottom: 23px; }
+.exchange-eyebrow { margin: 0 0 7px; color: #90978e; font-size: 8px; font-weight: 700; letter-spacing: 1px; }
+.exchange-heading h1 { margin: 0; font: 700 28px/1.2 Manrope, 'DM Sans', sans-serif; }
+.exchange-heading h1 span { color: #91b34f; }
+.exchange-heading > div > p:last-child { margin: 8px 0 0; color: #858d83; font-size: 11px; }
+.exchange-intro { min-height: 77px; padding: 13px 15px; border: 1px solid #dfe7d3; border-radius: 4px; background: #edf3e5; display: flex; align-items: center; gap: 12px; }
+.exchange-intro__symbol { width: 35px; height: 35px; flex: none; border-radius: 4px; background: #d9e7c9; color: #607746; display: grid; place-items: center; }
+.exchange-intro > div:nth-child(2) { flex: 1; }
+.exchange-intro strong { color: #3c4b34; font-size: 11px; }
+.exchange-intro p { max-width: 580px; margin: 4px 0 0; color: #75826d; font-size: 9px; line-height: 1.5; }
+.exchange-intro > span { color: #667c4e; display: flex; align-items: center; gap: 5px; font-size: 8px; white-space: nowrap; }
+.exchange-form { margin-top: 16px; padding: 17px; border: 1px solid #e3e6df; border-radius: 4px; background: #fbfcf9; }
+.exchange-form__heading { display: flex; justify-content: space-between; align-items: flex-start; }
+.exchange-form__heading h2 { margin: 0; font: 700 15px Manrope, 'DM Sans', sans-serif; }
+.exchange-form__heading button { width: 26px; height: 26px; padding: 0; border: 0; border-radius: 3px; background: transparent; color: #777f75; font-size: 20px; cursor: pointer; }
+.exchange-form__fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 13px; }
+.exchange-form label { color: #515950; display: grid; gap: 6px; font-size: 9px; font-weight: 600; }
+.exchange-form input, .exchange-form textarea { width: 100%; padding: 9px; border: 1px solid #dfe3db; border-radius: 3px; background: white; color: #303730; font: inherit; font-size: 10px; resize: vertical; }
+.exchange-form input:focus-visible, .exchange-form textarea:focus-visible { outline: 2px solid #9db86b; outline-offset: 1px; }
+.exchange-form__detail { margin-top: 11px; }
+.exchange-form__actions { margin-top: 10px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.exchange-form__actions > span { color: #92988f; font-size: 8px; }
+.exchange-list-heading { margin: 25px 0 13px; display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; }
+.exchange-list-heading .exchange-eyebrow { margin-bottom: 4px; }
+.exchange-list-heading h2 { margin: 0; font: 700 16px Manrope, 'DM Sans', sans-serif; }
+.exchange-list-heading > span { color: #92988f; font-size: 9px; }
+.exchange-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 13px; }
+.exchange-card { min-width: 0; padding: 14px; border: 1px solid #e3e6df; border-radius: 4px; background: #fbfcf9; }
+.exchange-card__person { display: flex; align-items: center; gap: 8px; }
+.exchange-avatar { width: 29px; height: 29px; flex: none; border-radius: 50%; color: #303730; display: grid; place-items: center; font-size: 8px; font-weight: 700; }
+.exchange-avatar--coral { background: #f1c6b6; }
+.exchange-avatar--blue { background: #c9e3ed; }
+.exchange-avatar--green { background: #cde5d4; }
+.exchange-avatar--gold { background: #f0df9d; }
+.exchange-card__person > div { min-width: 0; flex: 1; display: grid; gap: 3px; }
+.exchange-card__person strong { font-size: 9px; }
+.exchange-card__person small { color: #92988f; font-size: 7px; }
+.exchange-open { padding: 4px 6px; border-radius: 8px; background: #e7efdc; color: #687e4a; font-size: 7px; font-weight: 700; letter-spacing: .4px; }
+.exchange-trade { margin-top: 16px; display: grid; grid-template-columns: minmax(0, 1fr) 20px minmax(0, 1fr); align-items: center; gap: 6px; }
+.exchange-trade > div { min-width: 0; min-height: 57px; padding: 8px; border-radius: 3px; background: #f0f2ec; display: grid; align-content: center; gap: 5px; }
+.exchange-trade > div span { color: #92988f; font-size: 6px; font-weight: 700; letter-spacing: .5px; }
+.exchange-trade > div strong { overflow-wrap: anywhere; color: #465143; font-size: 8px; line-height: 1.35; }
+.exchange-trade > svg { color: #7f9364; }
+.exchange-card__detail { min-height: 34px; margin: 11px 0; color: #80887e; font-size: 8px; line-height: 1.5; }
+.exchange-card__footer { min-height: 30px; padding-top: 9px; border-top: 1px solid #e8eae5; display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.exchange-card__footer > span { color: #92988f; font-size: 7px; }
+.exchange-card__footer button { padding: 0; border: 0; background: transparent; color: #596d47; display: inline-flex; align-items: center; gap: 4px; font: 600 8px 'DM Sans', sans-serif; cursor: pointer; white-space: nowrap; }
+.exchange-card__footer button:disabled { color: #7e9270; cursor: default; }
+.exchange-notice { margin: 14px 0 0; color: #9aa096; font-size: 8px; line-height: 1.5; }
+
+@media (max-width: 900px) { .exchange-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .exchange-heading { align-items: flex-start; } .exchange-heading h1 { font-size: 24px; } .exchange-heading > div > p:last-child { max-width: 235px; font-size: 10px; line-height: 1.45; } .exchange-heading .ui-button { min-height: 32px; padding: 0 9px; font-size: 9px; } .exchange-intro { align-items: flex-start; } .exchange-intro > span { display: none; } .exchange-grid { grid-template-columns: 1fr; } .exchange-form__fields { grid-template-columns: 1fr; } .exchange-form__actions { align-items: flex-end; } }

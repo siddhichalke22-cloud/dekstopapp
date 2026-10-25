@@ -3,7 +3,11 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 const projectRelations = {
-	include: { members: true, team: true },
+	include: {
+		members: { include: { user: { select: { id: true, name: true, initials: true } } } },
+		team: true,
+		requiredSkills: { include: { skill: true } },
+	},
 };
 
 export function listProjects() {
@@ -30,4 +34,11 @@ export function updateProject(id, data) {
 
 export function deleteProject(id) {
 	return prisma.project.delete({ where: { id } });
+}
+
+export function createProjectApplication(projectId, userId, message) {
+	return prisma.projectApplication.create({
+		data: { projectId, userId, message },
+		include: { project: { select: { id: true, name: true } } },
+	});
 }

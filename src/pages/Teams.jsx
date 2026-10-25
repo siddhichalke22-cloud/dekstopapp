@@ -5,9 +5,9 @@ import './Teams.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:4000/api';
 const sampleTeams = [
-	{ id: 'design', name: 'Design studio', description: 'DESIGN', members: [{ initials: 'JD' }, { initials: 'MK' }, { initials: 'AL' }, { initials: 'SP' }], projects: [{ name: 'Website refresh' }] },
-	{ id: 'growth', name: 'Growth & launch', description: 'MARKETING', members: [{ initials: 'MK' }, { initials: 'SP' }, { initials: 'JD' }], projects: [{ name: 'Fall product launch' }] },
-	{ id: 'research', name: 'Research circle', description: 'RESEARCH', members: [{ initials: 'AL' }, { initials: 'JD' }], projects: [{ name: 'Customer research' }] },
+	{ id: 'design', name: 'Open Campus Lab', description: 'CAMPUS TECH', members: [{ initials: 'JD' }, { initials: 'PS' }, { initials: 'NK' }, { initials: 'AO' }], projects: [{ name: 'Campus accessibility map' }] },
+	{ id: 'growth', name: 'BuildTogether', description: 'HACKATHON', members: [{ initials: 'MK' }, { initials: 'SP' }, { initials: 'JD' }], projects: [{ name: 'Study buddy matching' }] },
+	{ id: 'research', name: 'Green Bytes', description: 'SUSTAINABILITY', members: [{ initials: 'AL' }, { initials: 'AO' }], projects: [{ name: 'Food waste tracker' }] },
 ];
 const avatarTones = ['coral', 'blue', 'green', 'gold', 'lilac'];
 
@@ -94,7 +94,7 @@ export default function Teams() {
 	return (
 		<div className="teams-page">
 			<header className="teams-heading">
-				<div><p className="teams-eyebrow">PEOPLE &amp; COLLABORATION</p><h1>Teams</h1><p>Bring the right people together around good work.</p></div>
+				<div><p className="teams-eyebrow">YOUR COLLABORATORS</p><h1>Teams</h1><p>Find your project groups and the skills they bring.</p></div>
 				<Button onClick={() => setDialogOpen(true)}><Plus size={15} /> Create team</Button>
 			</header>
 

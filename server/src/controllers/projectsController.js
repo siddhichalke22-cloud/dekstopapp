@@ -103,3 +103,22 @@ export async function deleteProject(request, response, next) {
 		return next(error);
 	}
 }
+
+export async function applyToProject(request, response, next) {
+	const { userId, message = '' } = request.body || {};
+	if (typeof userId !== 'string' || !userId.trim()) {
+		return response.status(400).json({ error: 'A student userId is required' });
+	}
+	if (typeof message !== 'string' || message.length > 1000) {
+		return response.status(400).json({ error: 'Application message must be under 1000 characters' });
+	}
+
+	try {
+		const application = await projectsService.createProjectApplication(request.params.id, userId.trim(), message.trim());
+		return response.status(201).json(application);
+	} catch (error) {
+		if (error.code === 'P2002') return response.status(409).json({ error: 'You have already applied to this project' });
+		if (error.code === 'P2003' || error.code === 'P2025') return response.status(404).json({ error: 'Project or student not found' });
+		return next(error);
+	}
+}

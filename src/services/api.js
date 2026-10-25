@@ -82,6 +82,13 @@ export const api = {
 		body: JSON.stringify(changes),
 		signal,
 	}),
+	getSkills: ({ signal } = {}) => request('/skills', { signal }),
+	getSkillExchanges: ({ signal } = {}) => request('/skills/exchanges', { signal }),
+	createSkillExchange: (exchange, { signal } = {}) => request('/skills/exchanges', {
+		method: 'POST',
+		body: JSON.stringify(exchange),
+		signal,
+	}),
 };
 
 export default api;

@@ -1,19 +1,15 @@
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
-const editableFields = ['name', 'email', 'title', 'initials'];
+const editableFields = ['name', 'email', 'title', 'initials', 'bio', 'university', 'major'];
 
 export async function getProfile(_request, response, next) {
 	try {
 		const profile = await prisma.user.findFirst({
 			orderBy: { createdAt: 'asc' },
-			select: {
-				id: true,
-				name: true,
-				email: true,
-				title: true,
-				initials: true,
-				createdAt: true,
+			include: {
+				skills: { include: { skill: true } },
+				learningGoals: { include: { skill: true } },
 			},
 		});
 
@@ -44,7 +40,7 @@ export async function updateProfile(request, response, next) {
 		const profile = await prisma.user.update({
 			where: { id: profileId },
 			data: Object.fromEntries(Object.entries(data).map(([field, value]) => [field, value.trim()])),
-			select: { id: true, name: true, email: true, title: true, initials: true, updatedAt: true },
+			select: { id: true, name: true, email: true, title: true, initials: true, bio: true, university: true, major: true, updatedAt: true },
 		});
 		return response.json(profile);
 	} catch (error) {

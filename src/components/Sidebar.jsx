@@ -1,32 +1,34 @@
-import { FolderKanban, LayoutDashboard, Users, UserRound, ChevronDown, CircleHelp } from 'lucide-react';
+import { FolderKanban, LayoutDashboard, Users, UserRound, ChevronDown, CircleHelp, Compass, Repeat2 } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import './Sidebar.css';
 
 const navigation = [
-	{ label: 'Overview', to: '/', icon: LayoutDashboard, end: true },
+	{ label: 'Dashboard', to: '/', icon: LayoutDashboard, end: true },
+	{ label: 'Discover', to: '/discover', icon: Compass },
 	{ label: 'Projects', to: '/projects', icon: FolderKanban },
-	{ label: 'Teams', to: '/teams', icon: Users },
+	{ label: 'My teams', to: '/teams', icon: Users },
+	{ label: 'Skill exchange', to: '/skill-exchange', icon: Repeat2 },
 ];
 
 export default function Sidebar() {
 	return (
 		<aside className="workspace-sidebar">
-			<a className="workspace-sidebar__brand" href="#/" aria-label="Orbit workspace home">
-				<span className="workspace-sidebar__brand-mark" aria-hidden="true">o</span>
-				<span>orbit<span className="workspace-sidebar__brand-dot">.</span></span>
+			<a className="workspace-sidebar__brand" href="#/" aria-label="SkillBridge home">
+				<span className="workspace-sidebar__brand-mark" aria-hidden="true">S</span>
+				<span>SkillBridge<span className="workspace-sidebar__brand-dot">.</span></span>
 			</a>
 
 			<button className="workspace-sidebar__workspace" type="button" aria-label="Workspace: Northstar Studio">
-				<span className="workspace-sidebar__workspace-mark" aria-hidden="true">N</span>
+				<span className="workspace-sidebar__workspace-mark" aria-hidden="true">U</span>
 				<span className="workspace-sidebar__workspace-copy">
-					<strong>Northstar Studio</strong>
-					<small>Free workspace</small>
+					<strong>University network</strong>
+					<small>Student community</small>
 				</span>
 				<ChevronDown size={15} aria-hidden="true" />
 			</button>
 
-			<div className="workspace-sidebar__section-label">WORKSPACE</div>
-			<nav className="workspace-sidebar__navigation" aria-label="Workspace navigation">
+			<div className="workspace-sidebar__section-label">COLLABORATE</div>
+			<nav className="workspace-sidebar__navigation" aria-label="Student collaboration navigation">
 				{navigation.map(({ label, to, icon: Icon, end }) => (
 					<NavLink
 						key={to}
@@ -36,7 +38,7 @@ export default function Sidebar() {
 					>
 						<Icon size={17} strokeWidth={1.8} aria-hidden="true" />
 						<span>{label}</span>
-						{label === 'Projects' && <span className="workspace-sidebar__count">8</span>}
+						{label === 'Discover' && <span className="workspace-sidebar__count">NEW</span>}
 					</NavLink>
 				))}
 			</nav>
@@ -53,7 +55,7 @@ export default function Sidebar() {
 					<span className="workspace-sidebar__avatar" aria-hidden="true">JD</span>
 					<span className="workspace-sidebar__account-copy">
 						<strong>Jamie Diaz</strong>
-						<small>jamie@northstar.design</small>
+						<small>Student profile</small>
 					</span>
 					<UserRound className="workspace-sidebar__account-icon" size={15} aria-hidden="true" />
 				</NavLink>

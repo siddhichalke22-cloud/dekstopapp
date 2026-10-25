@@ -12,10 +12,10 @@ const statusValues = {
 	Completed: 'COMPLETED',
 };
 const exampleProjects = [
-	{ id: 'sample-1', name: 'Website refresh', description: 'Brand & digital', status: 'IN_PROGRESS', progress: 72, dueDate: '2026-10-28' },
-	{ id: 'sample-2', name: 'Fall product launch', description: 'Campaign', status: 'IN_PROGRESS', progress: 48, dueDate: '2026-11-04' },
-	{ id: 'sample-3', name: 'Customer research', description: 'Research', status: 'IN_REVIEW', progress: 91, dueDate: '2026-11-12' },
-	{ id: 'sample-4', name: 'Studio identity', description: 'Brand system', status: 'PLANNING', progress: 16, dueDate: '2026-11-18' },
+	{ id: 'sample-1', name: 'Campus accessibility map', description: 'React · GIS · community research', status: 'IN_PROGRESS', progress: 28, dueDate: '2026-11-08' },
+	{ id: 'sample-2', name: 'Study buddy matching', description: 'Python · UI design · student life', status: 'PLANNING', progress: 0, dueDate: '2026-11-14' },
+	{ id: 'sample-3', name: 'Food waste tracker', description: 'Data visualization · Figma · sustainability', status: 'IN_REVIEW', progress: 64, dueDate: '2026-11-21' },
+	{ id: 'sample-4', name: 'Open-source lecture notes', description: 'Next.js · accessibility · education', status: 'PLANNING', progress: 16, dueDate: '2026-11-29' },
 ];
 
 function formatStatus(status) {
@@ -113,8 +113,8 @@ export default function Projects() {
 	return (
 		<div className="projects-page">
 			<header className="projects-heading">
-				<div><p className="projects-eyebrow">YOUR WORKSPACE</p><h1>Projects</h1><p>Keep the moving pieces moving.</p></div>
-				<Button onClick={() => setDialogOpen(true)}><Plus size={15} /> New project</Button>
+				<div><p className="projects-eyebrow">LEARN BY BUILDING</p><h1>Projects</h1><p>Create an idea or find a project that needs your skills.</p></div>
+					<Button onClick={() => setDialogOpen(true)}><Plus size={15} /> Start a project</Button>
 			</header>
 
 			<div className="projects-toolbar">
