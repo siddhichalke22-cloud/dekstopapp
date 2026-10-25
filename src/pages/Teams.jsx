@@ -67,7 +67,10 @@ export default function Teams() {
 				setApiConnected(true);
 			})
 			.catch((requestError) => {
-				if (requestError.name !== 'AbortError') setApiConnected(false);
+				if (requestError.name !== 'AbortError') {
+					setApiConnected(false);
+				setError('Could not load teams from the server. Showing preview teams instead.');
+			}
 			});
 		return () => controller.abort();
 	}, []);
@@ -135,7 +138,7 @@ export default function Teams() {
 						</article>
 					);
 				})}
-				{visibleTeams.length === 0 && <div className="teams-empty">No teams match your search.</div>}
+				{visibleTeams.length === 0 && <div className="teams-empty">{query ? 'No teams match your search.' : 'No teams yet. Create a team to start finding collaborators.'}</div>}
 			</section>
 
 			<footer className="teams-connection"><i className={apiConnected ? 'is-connected' : ''} />{apiConnected ? 'Synced with workspace' : 'Sample workspace data'}</footer>

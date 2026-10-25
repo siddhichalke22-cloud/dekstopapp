@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { ArrowUpRight, Camera, Check, CircleUserRound, LogOut, ShieldCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button.jsx';
+import { api, clearSession, getSessionUser } from '../services/api.js';
 import './Profile.css';
 
 const apiUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:4000/api';
@@ -15,31 +16,33 @@ const defaultProfile = {
 export default function Profile() {
 	const navigate = useNavigate();
 	const [profile, setProfile] = useState(defaultProfile);
-	const [profileId, setProfileId] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [saving, setSaving] = useState(false);
 	const [message, setMessage] = useState('');
 	const [messageType, setMessageType] = useState('');
+	const [skillsText, setSkillsText] = useState('');
+	const [goalsText, setGoalsText] = useState('');
 
 	useEffect(() => {
 		const controller = new AbortController();
-		fetch(`${apiUrl}/profile`, { signal: controller.signal })
-			.then(async (response) => {
-				if (!response.ok) throw new Error('Profile API unavailable');
-				return response.json();
-			})
+		api.getMyProfile({ signal: controller.signal })
 			.then((data) => {
 				setProfile({
+					...defaultProfile,
 					name: data.name || defaultProfile.name,
 					email: data.email || defaultProfile.email,
 					title: data.title || defaultProfile.title,
 					initials: data.initials || defaultProfile.initials,
+					bio: data.bio || '',
+					university: data.university || '',
+					major: data.major || '',
 				});
-				if (data.id) setProfileId(data.id);
+				setSkillsText((data.skills || []).map((item) => `${item.skill.name} (${item.proficiency.toLowerCase()})`).join(', '));
+				setGoalsText((data.learningGoals || []).map((item) => item.skill.name).join(', '));
 			})
 			.catch((error) => {
 				if (error.name !== 'AbortError') {
-					setMessage('Showing sample profile details. Connect the API and create a user record to save changes.');
+					setMessage(error.status === 401 ? 'Sign in to load and save your student profile.' : 'Could not load your profile from the server.');
 					setMessageType('info');
 				}
 			})
@@ -56,24 +59,16 @@ export default function Profile() {
 	async function handleSubmit(event) {
 		event.preventDefault();
 		setMessage('');
-		if (!profileId) {
-			setMessage('No saved user profile was returned by the API, so these changes are only local.');
-			setMessageType('info');
-			return;
-		}
-
 		setSaving(true);
 		try {
-			const response = await fetch(`${apiUrl}/profile/${encodeURIComponent(profileId)}`, {
-				method: 'PATCH',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(profile),
+			const updatedProfile = await api.updateMyProfile(profile);
+			await api.updateMySkills({
+				skills: skillsText.split(',').map((entry) => entry.trim()).filter(Boolean).map((entry) => {
+					const match = entry.match(/^(.*?)(?:\s*\((beginner|intermediate|advanced|expert)\))?$/i);
+					return { name: match[1].trim(), proficiency: (match[2] || 'BEGINNER').toUpperCase() };
+				}),
+				learningGoals: goalsText.split(',').map((name) => name.trim()).filter(Boolean).map((name) => ({ name, targetLevel: 'INTERMEDIATE' })),
 			});
-			if (!response.ok) {
-				const result = await response.json().catch(() => ({}));
-				throw new Error(result.error || 'Unable to save profile');
-			}
-			const updatedProfile = await response.json();
 			setProfile((current) => ({ ...current, ...updatedProfile }));
 			setMessage('Profile changes saved.');
 			setMessageType('success');
@@ -122,6 +117,10 @@ export default function Profile() {
 							<label>Job title<input name="title" onChange={updateField} required value={profile.title} /></label>
 							<label>Email address<input autoComplete="email" name="email" onChange={updateField} required type="email" value={profile.email} /></label>
 							<label>Avatar initials<input maxLength={4} name="initials" onChange={updateField} required value={profile.initials} /></label>
+							<label>University<input name="university" onChange={updateField} value={profile.university || ''} /></label>
+							<label>Major or program<input name="major" onChange={updateField} value={profile.major || ''} /></label>
+							<label className="profile-form__wide">Skills and proficiency<input onChange={(event) => setSkillsText(event.target.value)} placeholder="React (intermediate), Python (beginner)" value={skillsText} /></label>
+							<label className="profile-form__wide">Learning goals<input onChange={(event) => setGoalsText(event.target.value)} placeholder="Machine learning, UI design" value={goalsText} /></label>
 						</div>
 						<p className={`profile-message profile-message--${messageType}`} role="status" aria-live="polite">{loading ? 'Loading profile…' : message}</p>
 					</form>
@@ -155,7 +154,7 @@ export default function Profile() {
 						<span><strong>Security &amp; access</strong><small>Manage connected devices</small></span>
 						<ArrowUpRight size={15} />
 					</button>
-					<button className="profile-aside-link profile-aside-link--signout" type="button" onClick={() => navigate('/login')}>
+					<button className="profile-aside-link profile-aside-link--signout" type="button" onClick={() => { clearSession(); navigate('/login'); }}>
 						<LogOut size={17} />
 						<span><strong>Sign out</strong><small>Return to the login screen</small></span>
 						<ArrowUpRight size={15} />

@@ -1,14 +1,33 @@
 import { useState } from 'react';
 import { ArrowRight, Eye, EyeOff, LockKeyhole } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { api, saveSession } from '../services/api.js';
 import './Login.css';
 
 export default function Login() {
+	const navigate = useNavigate();
 	const [showPassword, setShowPassword] = useState(false);
+	const [registering, setRegistering] = useState(false);
+	const [submitting, setSubmitting] = useState(false);
 	const [message, setMessage] = useState('');
 
-	function handleSubmit(event) {
+	async function handleSubmit(event) {
 		event.preventDefault();
-		setMessage('Sign-in is not connected yet. Add your authentication API to continue.');
+		setSubmitting(true);
+		setMessage('');
+		const formData = new FormData(event.currentTarget);
+		const credentials = { email: formData.get('email'), password: formData.get('password') };
+		try {
+			const session = registering
+				? await api.register({ ...credentials, name: formData.get('name'), university: formData.get('university'), major: formData.get('major') })
+				: await api.login(credentials);
+			saveSession(session);
+			navigate('/', { replace: true });
+		} catch (error) {
+			setMessage(error.message || 'Unable to sign in right now.');
+		} finally {
+			setSubmitting(false);
+		}
 	}
 
 	return (
@@ -35,11 +54,16 @@ export default function Login() {
 			<section className="login-form-side">
 				<div className="login-form-wrap">
 					<p className="login-eyebrow">WELCOME BACK</p>
-					<h2>Pick up where<br />you left off.</h2>
-					<p className="login-form-intro">Sign in to find collaborators and continue learning together.</p>
+					<h2>{registering ? <>Create your<br />student account.</> : <>Pick up where<br />you left off.</>}</h2>
+					<p className="login-form-intro">{registering ? 'Join your campus community and find people to build with.' : 'Sign in to find collaborators and continue learning together.'}</p>
 
 					<form className="login-form" onSubmit={handleSubmit}>
-						<label htmlFor="login-email">Work email</label>
+						{registering && <>
+							<label htmlFor="login-name">Full name</label><input id="login-name" name="name" autoComplete="name" placeholder="Your name" required />
+							<label htmlFor="login-university">University</label><input id="login-university" name="university" placeholder="Your university" />
+							<label htmlFor="login-major">Major or program</label><input id="login-major" name="major" placeholder="e.g. Computer Science" />
+						</>}
+						<label htmlFor="login-email">Student email</label>
 						<input
 							id="login-email"
 							autoComplete="username"
@@ -49,10 +73,11 @@ export default function Login() {
 							type="email"
 						/>
 
-						<div className="login-password-label">
+						{!registering && <div className="login-password-label">
 							<label htmlFor="login-password">Password</label>
 							<a href="mailto:support@example.com?subject=Password%20reset">Forgot password?</a>
-						</div>
+						</div>}
+						{registering && <label htmlFor="login-password">Password (at least 8 characters)</label>}
 						<div className="login-password-input">
 							<LockKeyhole size={15} aria-hidden="true" />
 							<input
@@ -74,18 +99,18 @@ export default function Login() {
 							</button>
 						</div>
 
-						<label className="login-remember">
+						{!registering && <label className="login-remember">
 							<input type="checkbox" name="remember" />
 							<span>Keep me signed in</span>
-						</label>
+						</label>}
 
-						<button className="login-submit" type="submit">
-							Sign in <ArrowRight size={16} aria-hidden="true" />
+						<button className="login-submit" type="submit" disabled={submitting}>
+							{submitting ? 'Please wait…' : registering ? 'Create account' : 'Sign in'} <ArrowRight size={16} aria-hidden="true" />
 						</button>
 						<p className="login-message" role="status" aria-live="polite">{message}</p>
 					</form>
 
-					<p className="login-signup">New to Orbit? <a href="mailto:support@example.com?subject=Create%20an%20account">Ask your workspace admin <ArrowRight size={13} /></a></p>
+					<p className="login-signup">{registering ? 'Already have an account?' : 'New to SkillBridge?'} <button type="button" onClick={() => { setRegistering((value) => !value); setMessage(''); }}>{registering ? 'Sign in' : 'Create a student account'} <ArrowRight size={13} /></button></p>
 					<p className="login-legal">By signing in, you agree to your organization’s workspace policies.</p>
 				</div>
 			</section>

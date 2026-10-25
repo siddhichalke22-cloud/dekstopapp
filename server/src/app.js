@@ -4,6 +4,7 @@ import profileRouter from './routes/profile.js';
 import projectsRouter from './routes/projects.js';
 import teamsRouter from './routes/teams.js';
 import skillsRouter from './routes/skills.js';
+import authRouter from './routes/auth.js';
 
 const app = express();
 const allowedOrigins = new Set([
@@ -24,6 +25,7 @@ app.get('/api/health', (_request, response) => {
 	response.json({ status: 'ok' });
 });
 
+app.use('/api/auth', authRouter);
 app.use('/api/projects', projectsRouter);
 app.use('/api/teams', teamsRouter);
 app.use('/api/profile', profileRouter);

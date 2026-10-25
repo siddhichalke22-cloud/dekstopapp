@@ -1,4 +1,5 @@
 import * as projectsService from '../services/projectsService.js';
+import prisma from '../services/prisma.js';
 const allowedStatuses = new Set(['PLANNING', 'IN_PROGRESS', 'IN_REVIEW', 'COMPLETED']);
 const editableFields = ['name', 'description', 'status', 'progress', 'dueDate', 'teamId'];
 
@@ -105,20 +106,66 @@ export async function deleteProject(request, response, next) {
 }
 
 export async function applyToProject(request, response, next) {
-	const { userId, message = '' } = request.body || {};
-	if (typeof userId !== 'string' || !userId.trim()) {
-		return response.status(400).json({ error: 'A student userId is required' });
-	}
+	const { message = '' } = request.body || {};
 	if (typeof message !== 'string' || message.length > 1000) {
 		return response.status(400).json({ error: 'Application message must be under 1000 characters' });
 	}
 
 	try {
-		const application = await projectsService.createProjectApplication(request.params.id, userId.trim(), message.trim());
+		const application = await projectsService.createProjectApplication(request.params.id, request.user.id, message.trim());
 		return response.status(201).json(application);
 	} catch (error) {
 		if (error.code === 'P2002') return response.status(409).json({ error: 'You have already applied to this project' });
 		if (error.code === 'P2003' || error.code === 'P2025') return response.status(404).json({ error: 'Project or student not found' });
+		return next(error);
+	}
+}
+
+export async function listMyApplications(request, response, next) {
+	try {
+		const applications = await prisma.projectApplication.findMany({
+			where: { userId: request.user.id },
+			include: { project: { include: { team: true, requiredSkills: { include: { skill: true } } } } },
+			orderBy: { createdAt: 'desc' },
+		});
+		return response.json(applications);
+	} catch (error) {
+		return next(error);
+	}
+}
+
+export async function listBookmarks(request, response, next) {
+	try {
+		const bookmarks = await prisma.projectBookmark.findMany({
+			where: { userId: request.user.id },
+			include: { project: { include: { team: true, requiredSkills: { include: { skill: true } } } } },
+			orderBy: { createdAt: 'desc' },
+		});
+		return response.json(bookmarks.map((bookmark) => bookmark.project));
+	} catch (error) {
+		return next(error);
+	}
+}
+
+export async function saveBookmark(request, response, next) {
+	try {
+		const bookmark = await prisma.projectBookmark.upsert({
+			where: { projectId_userId: { projectId: request.params.id, userId: request.user.id } },
+			create: { projectId: request.params.id, userId: request.user.id },
+			update: {},
+		});
+		return response.status(201).json(bookmark);
+	} catch (error) {
+		if (error.code === 'P2003') return response.status(404).json({ error: 'Project not found' });
+		return next(error);
+	}
+}
+
+export async function removeBookmark(request, response, next) {
+	try {
+		await prisma.projectBookmark.deleteMany({ where: { projectId: request.params.id, userId: request.user.id } });
+		return response.status(204).end();
+	} catch (error) {
 		return next(error);
 	}
 }
