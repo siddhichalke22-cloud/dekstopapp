@@ -6,12 +6,6 @@ import Card from '../components/Card.jsx';
 import { api, getSessionUser } from '../services/api.js';
 import './Dashboard.css';
 
-const sampleProjects = [
-	{ id: 'campus-map', name: 'Campus accessibility map', category: 'Open to frontend + GIS', progress: 28, dueDate: 'Nov 08', tone: 'green', people: ['JD', 'PS', 'NK'] },
-	{ id: 'study-buddy', name: 'Study buddy matching', category: 'Looking for a Python learner', progress: 42, dueDate: 'Nov 14', tone: 'blue', people: ['MK', 'SP'] },
-	{ id: 'food-waste', name: 'Food waste tracker', category: 'Data + design collaboration', progress: 64, dueDate: 'Nov 21', tone: 'coral', people: ['AL', 'JD'] },
-];
-
 function initialsTone(initials) {
 	return `dashboard-avatar--${({ JD: 'coral', MK: 'blue', AL: 'green', SP: 'gold' })[initials] || 'lilac'}`;
 }
@@ -23,7 +17,7 @@ function ProjectPeople({ people }) {
 }
 
 export default function Dashboard() {
-	const [projects, setProjects] = useState(sampleProjects);
+	const [projects, setProjects] = useState([]);
 	const [students, setStudents] = useState([]);
 	const [offers, setOffers] = useState([]);
 	const [learningGoalCount, setLearningGoalCount] = useState(0);
@@ -106,6 +100,7 @@ export default function Dashboard() {
 								<button className="dashboard-more" type="button" aria-label={`More options for ${project.name}`}><Ellipsis size={17} /></button>
 							</article>
 						))}
+						{projects.length === 0 && <p className="dashboard-activity__note">No projects yet. Start one to find collaborators.</p>}
 					</div>
 					<Link className="dashboard-view-all" to="/skill-exchange"><span><Plus size={14} /></span>Explore skill exchange<ArrowRight size={14} /></Link>
 					<div className="dashboard-sync"><i className={apiConnected ? 'is-connected' : ''} />{apiConnected ? 'Synced with workspace' : 'Showing workspace preview'}</div>

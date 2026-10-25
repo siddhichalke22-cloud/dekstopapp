@@ -4,11 +4,6 @@ import Button from '../components/Button.jsx';
 import { api } from '../services/api.js';
 import './Teams.css';
 
-const sampleTeams = [
-	{ id: 'design', name: 'Open Campus Lab', description: 'CAMPUS TECH', members: [{ initials: 'JD' }, { initials: 'PS' }, { initials: 'NK' }, { initials: 'AO' }], projects: [{ name: 'Campus accessibility map' }] },
-	{ id: 'growth', name: 'BuildTogether', description: 'HACKATHON', members: [{ initials: 'MK' }, { initials: 'SP' }, { initials: 'JD' }], projects: [{ name: 'Study buddy matching' }] },
-	{ id: 'research', name: 'Green Bytes', description: 'SUSTAINABILITY', members: [{ initials: 'AL' }, { initials: 'AO' }], projects: [{ name: 'Food waste tracker' }] },
-];
 const avatarTones = ['coral', 'blue', 'green', 'gold', 'lilac'];
 
 function TeamDialog({ onClose, onCreate }) {
@@ -49,7 +44,7 @@ function TeamDialog({ onClose, onCreate }) {
 }
 
 export default function Teams() {
-	const [teams, setTeams] = useState(sampleTeams);
+	const [teams, setTeams] = useState([]);
 	const [query, setQuery] = useState('');
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [apiConnected, setApiConnected] = useState(false);
@@ -142,7 +137,7 @@ export default function Teams() {
 				{visibleTeams.length === 0 && <div className="teams-empty">{query ? 'No teams match your search.' : 'No teams yet. Create a team to start finding collaborators.'}</div>}
 			</section>
 
-			<footer className="teams-connection"><i className={apiConnected ? 'is-connected' : ''} />{apiConnected ? 'Synced with workspace' : 'Sample workspace data'}</footer>
+			<footer className="teams-connection"><i className={apiConnected ? 'is-connected' : ''} />{apiConnected ? 'Connected to SkillBridge' : 'Could not connect to SkillBridge API'}</footer>
 			{dialogOpen && <TeamDialog onClose={() => setDialogOpen(false)} onCreate={createTeam} />}
 		</div>
 	);

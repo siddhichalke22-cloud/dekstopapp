@@ -56,7 +56,7 @@ export async function updateProfile(request, response, next) {
 	try {
 		const profile = await prisma.user.update({
 			where: { id: profileId },
-			data: Object.fromEntries(Object.entries(data).map(([field, value]) => [field, value.trim()])),
+			data: Object.fromEntries(Object.entries(data).map(([field, value]) => [field, typeof value === 'string' ? value.trim() : value])),
 			select: { id: true, name: true, email: true, title: true, initials: true, bio: true, university: true, major: true, projectUpdates: true, weeklyDigest: true, updatedAt: true },
 		});
 		return response.json(profile);

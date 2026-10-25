@@ -11,13 +11,6 @@ const statusValues = {
 	Planning: 'PLANNING',
 	Completed: 'COMPLETED',
 };
-const exampleProjects = [
-	{ id: 'sample-1', name: 'Campus accessibility map', description: 'React · GIS · community research', status: 'IN_PROGRESS', progress: 28, dueDate: '2026-11-08' },
-	{ id: 'sample-2', name: 'Study buddy matching', description: 'Python · UI design · student life', status: 'PLANNING', progress: 0, dueDate: '2026-11-14' },
-	{ id: 'sample-3', name: 'Food waste tracker', description: 'Data visualization · Figma · sustainability', status: 'IN_REVIEW', progress: 64, dueDate: '2026-11-21' },
-	{ id: 'sample-4', name: 'Open-source lecture notes', description: 'Next.js · accessibility · education', status: 'PLANNING', progress: 16, dueDate: '2026-11-29' },
-];
-
 function formatStatus(status) {
 	return ({ IN_PROGRESS: 'In progress', IN_REVIEW: 'In review', PLANNING: 'Planning', COMPLETED: 'Completed' })[status] || status;
 }
@@ -75,7 +68,7 @@ function ProjectDialog({ onClose, onCreate }) {
 }
 
 export default function Projects() {
-	const [projects, setProjects] = useState(exampleProjects);
+	const [projects, setProjects] = useState([]);
 	const [filter, setFilter] = useState('All projects');
 	const [query, setQuery] = useState('');
 	const [dialogOpen, setDialogOpen] = useState(false);
@@ -138,8 +131,8 @@ export default function Projects() {
 						<button className="projects-icon-button" type="button" aria-label={`More options for ${project.name}`} title="Project actions are not configured"><Ellipsis size={18} /></button>
 					</article>
 				))}
-				{visibleProjects.length === 0 && <div className="projects-empty">No projects match this view.</div>}
-				<footer className="projects-table__footer"><span>Showing {visibleProjects.length} of {projects.length} projects</span><span className={`projects-connection${apiConnected ? ' is-connected' : ''}`}><i />{apiConnected ? 'Synced with workspace' : 'Sample workspace data'}</span></footer>
+				{visibleProjects.length === 0 && <div className="projects-empty">{query || filter !== 'All projects' ? 'No projects match this view.' : 'No projects yet. Start a project and invite collaborators.'}</div>}
+				<footer className="projects-table__footer"><span>Showing {visibleProjects.length} of {projects.length} projects</span><span className={`projects-connection${apiConnected ? ' is-connected' : ''}`}><i />{apiConnected ? 'Connected to SkillBridge' : 'Could not connect to SkillBridge API'}</span></footer>
 			</section>
 			{dialogOpen && <ProjectDialog onClose={() => setDialogOpen(false)} onCreate={createProject} />}
 		</div>
